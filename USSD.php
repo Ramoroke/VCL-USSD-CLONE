@@ -1,331 +1,238 @@
 <?php
-// Read the variables sent via POST from our API
-$sessionId   = $_POST["sessionId"];
-$serviceCode = $_POST["serviceCode"];
-$phoneNumber = $_POST["phoneNumber"];
-$text        = $_POST["text"];
+    // Read the variables sent via POST from our API
+    $sessionId   = $_POST["sessionId"];
+    $serviceCode = $_POST["serviceCode"];
+    $phoneNumber = $_POST["phoneNumber"];
+    $text        = $_POST["text"];
 
-if ($text == "") {
-    // This is the first request. Note how we start the response with CON
-    $response  = "CON 1. Balances \n";
-    $response .= "2. Buy Bundles \n";
-    $response .= "3. Airtime Advance \n";
-    $response .= "4. M-Pesa \n";
-    $response .= "5. NXL LVL(Youth)\n";
-    $response .= "6. Just 4 U \n";
-    $response .= "7. Self Service \n";
-    $response .= "8. Entertanment \n";
-    $response .= "9. Customer Preferences \n";
-    $response .= "10. Mega Jackpot \n";
+    include($_SERVER['DOCUMENT_ROOT']."/connectdb.php");
 
-} else if ($text == "1") {
-    // Balances
-    $response = "CON 1. Summary \n";
-    $response .= "2. Detailed \n";
+    // Database interaction with USSD
+    $sql = "SELECT * FROM `phone` WHERE phone_number = '".$phoneNumber."' ";
+    // // $resultSet = mysqli_query($conn, $sql);
+    // // $isValidlogin = mysqli_num_rows($resultSet);
+    // if ($isValidlogin =< 0) {
+    //     // add to database
+    //     $sql_insert = "INSERT INTO `phone` (`phone_number`, `airtime`, `data`, `voice_bundles`, `sms`) VALUES ('".$phoneNumber."', '0', '0', '0', '0')";
+    // }
 
-} else if ($text == "2") {
-    // Buy Bundles
-    $response = "CON 1. Buy For Myself \n";
-    $response .= "2. Buy For Others \n ";
+    // $userDetails = mysqli_fetch_assoc($resultSet);
 
-} else if ($text =="3") {
-    // Airtime Advances
-    $response = "CON  Airtime Advance. Select amount up to M5 \n";
-    $response .= "1. Airtime \n";
-    $response .= "2. Bundles \n";
-    $response .= "3. Balance \n";
-    $response .= "4. Historical Advances \n";
-    $response .= "5. Secs \n";
-    $response .= "Ts n Cs \n";
+    // Variables used in the USSD
+    // $phone = $userDetails['phone_number'];
+    // $airtime = $userDetails['airtime'];
+    // $data = $userDetails['data'];
+    // $voice = $userDetails['voice_bundles'];
+    // $sms = $userDetails['sms'];
 
-    if ($text == "3*1") {
-        // Airtime Advance
-        $response = "CON Airtime Advance. Select amount up to M5 \n";
-        $response .= "1. M3 \n ";
-        $response .= "2. M5 \n ";
+    if ($text == "") {
+        // This is the first request.
+        $response  = "CON 1. Balances \n";
+        $response .= "2. Buy Bundles \n";
+        $response .= "3. Airtime Advance \n";
+        $response .= "4. M-Pesa \n";
+        $response .= "5. NXL LVL(Youth)\n";
+        $response .= "6. Just 4 U \n";
+        $response .= "7. Self Service \n";
+        $response .= "8. Entertanment \n";
+        $response .= "9. Customer Preferences \n";
+        $response .= "10. Mega Jackpot \n";
+
+    } elseif ($text == "1") {
+        // Balances
+        $response = "CON 1. Summary \n";
+        $response .= "2. Detailed \n";
+
+    } elseif ($text =="1*1") {
+        // Summary include database queries to get the right amount
+        $response = "END Airtime is M$airtime.00; Data is $data.00Mb; Voice is $voice Minutes 0 Sec; SMS $sms \n";
+
+    } elseif ($text == "1*2") {
+        // Detailed
+        // Send a summary to your phone
+        $response = "END Detailed balances will be sent to you shortly via SMS \n";
+        // Include function that sends text messages
+
+    } elseif ($text == "2") {
+        // Buy Bundles
+        $response = "CON 1. Buy For Myself \n";
+        $response .= "2. Buy For Others \n ";
+
+    } elseif ($text == "2*1") {
+        // Buy Bundles for Myself
+        $response = "CON  0. Hot Deals \n";
+        $response .= "1. Voice Bundles \n";
+        $response .= "2. Data Bundles \n";
+        $response .= "3. Roaming Bundles \n";
+        $response .= "4. Sms Bundles \n";
+
+    } elseif ($text == "2*1*0") {
+
+        // H O T    D E A L S
+        $response = "CON  1. More Deals \n";
+
+    } elseif ($text == "2*1*0*1") {
+        // Sample deals offered by vodacom
+        $response = "CON  1. 3.5 GB valid for 7days at M85.00 Hot Deals \n";
+        $response .= "2. 26 VCL to VCL mins valid for 1hrs at M2.00 \n";
+        $response .= "3. 45MB valid for 1hrs at M0.90 \n";
+
+    } elseif ($text == "2*1*0*1*1") {
+        // Cannot buy this is for testing purpose try buying voice, data, or Sms bundles
+        $response = "END Cannot buy this is for testing purpose try buying voice, data, or Sms bundles. \n";
+
+    } elseif ($text == "2*1*0*1*2") {
+        // Cannot buy this is for testing purpose try buying voice, data, or Sms bundles
+        $response = "END Cannot buy this is for testing purpose try buying voice, data, or Sms bundles. \n";
+
+    } elseif ($text == "2*1*0*1*3") {
+        // Cannot buy this is for testing purpose try buying voice, data, or Sms bundles
+        $response = "END Cannot buy this is for testing purpose try buying voice, data, or Sms bundles. \n";
+
+    } elseif ($text == "2*1*1") {
+
+        // V O I C E    B U N D L E S
+        // Calling Bundles
+        $response = "CON  1. Daily Calling Bundles \n";
+        $response .= "2. Weekly Calling Bundles \n";
+        $response .= "3. Monthly Calling Bundles \n";
+
+    } elseif ($text == "2*1*1*1") {
+        // Daily Calling Bundles
+        $response = "CON  0. J4U calling bundles 26 VCL to VCL mins valid for 1hrs at M2.00 \n";
+        $response .= "1. M2 for 4 All Net Minutes \n";
+        $response .= "2. M3 for 7 All Net Minutes \n";
+        $response .= "3. M5 for 12 All Net Minutes \n";
+        $response .= "5. Next \n";
+
+    } elseif ($text == "2*1*1*1*0") {
+        // Confirm option 0
+        $response = "CON You have requested J4U calling bundles 26 VCL to VCL mins valid for 1hrs at M2.00 ";
+        $response .= "1. Confirm \n ";
         $response .= "0. Back \n ";
 
-        if ($text == "3*1*1") {
-            // First Choice
-            $response = "CON You have requested for a M3 Airtime Advance. M3 allong with a service fee of M1 will be deducted from your next recharge. T&Cs apply. \n";
-            $response .= "1. Confirm \n ";
-            $response .= "0. Back \n ";
-
-            if ($text == "3*1*1*1") {
-                // Confirm Advance
-                //Run Sql query for increasing balance and set a trigger to wait for next recharge and take what is due
-
-            } elseif ($text == "3*1*1*0") {
-                // Go back
-                $text = "3*1*1";
-            }
-        } else if ($text == "3*1*2") {
-            // First Choice
-            $response = "CON You have requested for a M5 Airtime Advance. M5 allong with a service fee of M1 will be deducted from your next recharge. T&Cs apply. \n";
-            $response .= "1. Confirm \n ";
-            $response .= "0. Back \n ";
-
-            if ($text == "3*1*1*1") {
-                // Confirm Advance
-                //Run Sql query for increasing balance and set a trigger to wait for next recharge and take what is due
-
-            } elseif ($text == "3*1*1*0") {
-                // Go back
-                $text = "3*1*2";
-            }
+    } elseif ($text == "2*1*1*1*0*1") {
+        // Confirmed option 0
+        if ($airtime < 2) {
+            // Disallow buying
+            $response = "END Insuficient funds please recharge your account.";
         }
+        // $buying_airtime = $airtime - 2;
+        // $sql_buying_airtime = "UPDATE `phone` SET `airtime` = '$bought_bundles' WHERE `phone`.`phone_number` = '".$phoneNumber."' ";
+        // $bought_bundles = $voice + 26;
+        // $sql_buy = "UPDATE `phone` SET `voice_bundles` = '$bought_bundles' WHERE `phone`.`phone_number` = '".$phoneNumber."' ";
+        $response = "END You have bought J4U calling bundles 26 VCL to VCL mins valid for 1hrs at M2.00";
 
-
-    } else if ($text == "3*2") {
-        // Bundles Advance
-        $response = "CON Bundle Advance. Select a bundle advance up to M5 \n";
-        $response .= "1. Voice Bundles \n ";
-        $response .= "2. Data Bundles \n ";
+    } elseif ($text == "2*1*1*1*1") {
+        // Confirm option 1
+        $response = "You have requested M2 for 4 All Net Minutes valid until 00:00 to buy ";
+        $response .= "1. Confirm \n ";
         $response .= "0. Back \n ";
 
-        if ($text == "3*2*1") {
-            //Voice bundles
-            $response = "CON Daily Voice Bundles. Select: \n";
-            $response .= "1. M3 for 7 All Net Minutes \n ";
-            $response .= "2. M5 for 12 All Net Minutes \n ";
-            $response .= "0. Back \n ";
-
-            if ($text == "3*2*1*1") {
-                // M3 Voice bundles
-                $response = "CON You have requested for a M3 for 7 All Net Minutes valid until 00:00. M3 allong with a service fee of M1 will be deducted from your next recharge. T&Cs apply. \n";
-                $response .= "1. Confirm \n ";
-                $response .= "0. Back \n ";
-
-                if ($text == "3*2*1*1*1") {
-                    // Confirm
-                    $response = "END Only test with the the airtime advance as functionaity is almost the same with this part \n";
-                }
-
-            } else if ($text == "3*2*1*1") {
-                // M5 Voice Bundles 
-                $response = "END Only test with the M3 bundles as the process from now is the same. \n";
-            }
+    } elseif ($text == "2*1*1*1*1*1") {
+        // Confirmed option 1
+        if ($airtime < 2) {
+            // Disallow buying
+            $response = "END Insuficient funds please recharge your account.";
         }
+        // $buying_airtime = $airtime - 2;
+        // $sql_buying_airtime = "UPDATE `phone` SET `airtime` = '$bought_bundles' WHERE `phone`.`phone_number` = '".$phoneNumber."' ";
+        // $bought_bundles = $voice + 4;
+        // $sql_buy = "UPDATE `phone` SET `voice_bundles` = '$bought_bundles' WHERE `phone`.`phone_number` = '".$phoneNumber."' ";
+        $response = "END You have bought M2 for 4 All Net Minutes valid until 00:00";
 
-    } else if ($text == "3*3") {
-        // Balance
-        $response = "CON You do not have an outstanding Airtime Advance.";
+    } elseif ($text == "2*1*1*1*2") {
+        // Confirm option 2
+        $response = "CON You have requested M3 for 7 All Net Minutes valid until 00:00 to buy ";
+        $response .= "1. Confirm \n ";
         $response .= "0. Back \n ";
 
-    } else if ($text == "3*4") {
-        // Historical Advances
-        // An SMS that will send an SMS
-        $response = "END Your request is being processed. You will recieve SMS notification shortly.";
+    } elseif ($text == "2*1*1*1*2*1") {
+        // Confirmed option 2
+        if ($airtime < 3) {
+            // Disallow buying
+            $response = "END Insuficient funds please recharge your account.";
+        }
+        // $buying_airtime = $airtime - 3;
+        // $sql_buying_airtime = "UPDATE `phone` SET `airtime` = '$bought_bundles' WHERE `phone`.`phone_number` = '".$phoneNumber."' ";
+        // $bought_bundles = $voice + 7;
+        // $sql_buy = "UPDATE `phone` SET `voice_bundles` = '$bought_bundles' WHERE `phone`.`phone_number` = '".$phoneNumber."' ";
+        $response = "END You have bought M3 for 7 All Net Minutes valid until 00:00";
 
-    } else if ($text == "3*5") {
-        // Ses
-        $response = "END Your request is being processed. You will recieve SMS notification shortly.";
+    } elseif ($text == "2*1*1*1*3") {
+        // Confirm option 3
+        $response = "CON You have requested M5 for 12 All Net Minutes valid until 00:00 to buy ";
+        $response .= "1. Confirm \n ";
+        $response .= "0. Back \n ";
 
-    } else if ($text == "3*6") {
-        // Ts n Cs
-        $response = "END Visit www.google.com for mor info";
-    }
+    } elseif ($text == "2*1*1*1*3*1") {
+        // Confirmed option 3
+        if ($airtime < 5) {
+            // Disallow buying
+            $response = "END Insuficient funds please recharge your account.";
+        }
+        // $buying_airtime = $airtime - 5;
+        // $sql_buying_airtime = "UPDATE `phone` SET `airtime` = '$bought_bundles' WHERE `phone`.`phone_number` = '".$phoneNumber."' ";
+        // $bought_bundles = $voice + 12;
+        // $sql_buy = "UPDATE `phone` SET `voice_bundles` = '$bought_bundles' WHERE `phone`.`phone_number` = '".$phoneNumber."' ";
+        $response = "END You have bought M5 for 12 All Net Minutes valid until 00:00";
 
-} else if ($text =="4") {
-    // Functionality Covered in Ecocash Clone not here
-    $response = "END  0. Same Functionality Covered in Ecocash Clone not here \n";
-
-}else if ($text =="5") {
-    // Next Level 
-    $response = "CON  1. Social Promotion \n";
-    $response .= "2. Voice Bundles \n";
-    $response .= "3. Data Bunldes \n";
-    $response .= "4. SMS Bundles \n";
-    $response .= "5. Social Bundles \n";
-    $response .= "6. Balances \n";
-    $response .= "Ts n Cs \n";
-
-    if ($text =="5*1") {
-        // All functionalinty of buying is the same
-        $response = "END Only test with the the airtime advance as functionaity is almost the same with this part \n";
-    } else if ($text =="5*2") {
-        # code...
-        $response = "END Only test with the the airtime advance as functionaity is almost the same with this part \n";
-
-    } else if ($text =="5*3") {
-        # code...
-        $response = "END Only test with the the airtime advance as functionaity is almost the same with this part \n";
-
-    } else if ($text =="5*4") {
-        # code...
-        $response = "END Only test with the the airtime advance as functionaity is almost the same with this part \n";
-
-    } else if ($text =="5*4") {
-        # code...
-        $response = "END Only test with the the airtime advance as functionaity is almost the same with this part \n";
-
-    } else if ($text =="5*5") {
-        # code...
-        $response = "END Only test with the the airtime advance as functionaity is almost the same with this part \n";
-
-    } else if ($text =="5*6") {
-        # code...
-        $response = "END Only test with the the airtime advance as functionaity is almost the same with this part \n";
-    }
-    
-}else if ($text =="6") {
-    // Just 4 U
-    $response = "CON  Just4U Menu \n";
-    $response .= "0. Litlabolane \n";
-    $response .= "1. J4U Voice \n";
-    $response .= "2. J4U Data \n";
-    $response .= "3. VodaTargets Social Bundles \n";
-    $response .= "4. Bundle Upsize \n";
-    $response .= "5. Just4 your town \n";
-    $response .= "6. Balances \n";
-    $response = "END Only test with the the airtime advance as functionaity is almost the same with this part \n";
-    
-}else if ($text =="7") {
-    // Self Services
-    $response = "CON  Welcome to Self Services \n";
-    $response .= "1. Airtime charging \n";
-    $response .= "2. SMS'a molebe \n";
-    $response .= "3. ICCID  \n";
-    
-}else if ($text =="8") {
-    // Entertanment
-    $response = "CON  1. Welcome Tones \n";
-    $response .= "2. Football \n";
-    $response .= "3. Instavoices \n";
-    $response .= "4. Meg My Day \n";
-    $response .= "5. Vodacom Tickets \n";
-    
-}else if ($text =="9") {
-    // Customer Preferences
-    $response = "CON  Customer preferences allow you to personalize your Vodacom attributes \n";
-    $response .= "1. OOB DATA Usage \n";
-    $response .= "2. OOB SMS Usage\n";
-    
-}else if ($text =="10" /* Missing Condition For Second time usage */) {
-    // Mega Jackpot
-    if ($count == 0) {
-        // first time using this part
-        $response = "CON  Welcome to Mega Jackpot! Participate and win millions \n";
-        $response .= "1. Sesotho \n";
-        $response .= "2. English \n";
-
-    } else {
-        // Second or third time visitors
-        $response = "CON  Mega Jackpot!\n";
-        $response .= "1. Subscribe and PLAY \n";
-        $response .= "2. Play Once \n";
-        $response .= "3. Bundles \n";
-        $response .= "4. Ticket Packages \n";
-        $response .= "5. Account \n";
-
-    }  
-    
-} else if($text == "1*1") { 
-    // Summary Of Balances 
-    $response .= "END Airtime is M1.52; Data is 0.00Mb; Voice is 0 Minutes 0 Sec; SMS 0 Buy \n";
-
-} else if ($text == "1*2") {
-    // Send a summary to your phone
-    $response = "END Detailed balances will be sent to you shortly via SMS \n";
-    // Include function that sends text messages
-
-} else if ($text == "2*1") {
-    //Buy bundles for self
-    $response = "CON  0. Hot Deals \n";
-    $response .= "1. Voice Bundles \n";
-    $response .= "2. Data Bundles \n";
-    $response .= "3. Roaming Bundles \n";
-    $response .= "4. Sms Bundles \n";
-
-} else if ($text == "2*1*0") {
-    //
-    $response = "CON  1. More Deals \n";
-
-} elseif ($text == "2*1*0*1") {
-    // Sample deals offered by vodacom
-    $response = "CON  1. 3.5 GB valid for 7days at M85.00 Hot Deals \n";
-    $response .= "2. 26 VCL to VCL mins valid for 1hrs at M2.00 \n";
-    $response .= "3. 45MB valid for 1hrs at M0.90 \n";
-
-} elseif ($text == "2*1*1") {
-    // Calling Bundles
-    $response = "CON  1. Daily Calling Bundles \n";
-    $response .= "2. Weekly Calling Bundles \n";
-    $response .= "3. Monthly Calling Bundles \n";
-
-} else if ($text == "2*1*1*1") {
-    // Daily Calling Bundles
-    $response = "CON  0. J4U calling bundles 26 VCL to VCL mins valid for 1hrs at M2.00 \n";
-    $response .= "1. M2 for 4 All Net Minutes \n";
-    $response .= "2. M3 for 7 All Net Minutes \n";
-    $response .= "3. M5 for 12 All Net Minutes \n";
-
-    // Implement the next page
-    if ($text == "2*1*1*1*5") {
-        // Nex Page
+    } elseif ($text == "2*1*1*1*5") {
+        // Confirm option 5
+        // Next Page
         $response .= "1. M7 for 14 All Net Minutes \n";
         $response .= "2. M10 for 20 All Net Minutes \n";
         $response .= "3. M12 for 25 All Net Minutes \n";
+
+    } elseif ($text == "2*1*1*1*5*1") {
+        // Cannot buy here functionality already exist on the first page
+        $response = "END Cannot buy, just use the first 3 options. \n";
+
+    } elseif ($text == "2*1*1*1*5*2") {
+        // Cannot buy here functionality already exist on the first page
+        $response = "END Cannot buy, just use the first 3 options. \n";
+
+    } elseif ($text == "2*1*1*1*5*3") {
+        // Cannot buy here functionality already exist on the first page
+        $response = "END Cannot buy, just use the first 3 options. \n";
+
+    } elseif ($text == "2*1*1*2") {
+        // Weekly Calling Bundles
+        $response = "END Cannot buy weekly bundles try daily, functionality is the same. \n";
+
+    } elseif ($text == "2*1*1*3") {
+        // Weekly Calling Bundles
+        $response = "END Cannot buy monthly bundles try daily, functionality is the same. \n";
+        
+    } elseif ($text == "2*1*2") {
+        // D A T A    B U N D L E S
+        /* Functionality is still the same as buying voice bundles but this will update the data part of the table
+        while still taking the needed amount of airtime. So implementation will be redundancy.
+        */
+        $response = "END Cannot data bundles try voice bundles, functionality is the same. \n";
+
+    } elseif ($text == "2*1*3") {
+        // R O A M I N G    B U N D L E S
+        /* Functionality is still the same as buying voice bundles but this will update the roaming part of the table
+        while still taking the needed amount of airtime. So implementation will be redundancy.
+        */
+        $response = "END Cannot roaming bundles try voice bundles, functionality is the same. \n";
+
+    } elseif ($text == "2*1*4") {
+        // S M S    B U N D L E S
+        /* Functionality is still the same as buying voice bundles but this will update the SMS part of the table
+        while still taking the needed amount of airtime. So implementation will be redundancy.
+        */
+        $response = "END Cannot SMS bundles try voice bundles, functionality is the same. \n";
+
+    } elseif ($text == "2*2") {
+        // Buy bundles For Others
+        /* This functionality cannot be tested on the africa's talking platform so implementation will not be here
+        But for reference this will check if the provided phone number exist within the phone numbers table and 
+        the necessary column of the table will be updated with the chosen bundles bought.
+        */
+        $response = "END Cannot buy bundles for others buy for yourself, functionality is the same. \n";
     }
-
-} else if ($text == "2*2") {
-    // Buy bundles for others
-    $response = "CON  Enter number? \n";
-
-    // sql query to check if phone number exist in our database
-
-    if ($text == $exisiting_phone) {
-        // If the phone is within our database
-        $response = "CON  0. Hot Deals \n";
-        $response .= "1. Airtime Transfer \n";
-        $response .= "2. Voice Bundles \n";
-        $response .= "3. Data Bundles \n";
-        $response .= "4. Roaming Bundles \n";
-        $response .= "5. Sms Bundles \n";
-
-        // Difference now from other functionality is the SQL queries will update values in two different rows for the number being bought for and the buying phone
-        if ($text == "0") {
-            // First Selection
-            $response = "CON  1. More Deals \n";
-
-            if ($text == "0*1") {
-                // Sample deals offered by vodacom
-                $response = "CON  1. 3.5 GB valid for 7days at M85.00 Hot Deals \n";
-                $response .= "2. 26 VCL to VCL mins valid for 1hrs at M2.00 \n";
-                $response .= "3. 45MB valid for 1hrs at M0.90 \n";
-
-                if ($text == "0*1*1") {
-                    // Buy sample deal for another phone
-                    $response = "CON You have requested 3.5 GB valid for 7days at M85.00 to buy for ";
-                    $response .= "1. Confirm \n ";
-                    $response .= "0. Back \n ";
-                }
-            }
-
-        } elseif ($text == "1") {
-            # code...
-            $response = "END Only test with the Hot Deals bundles as the process from now is the same.";
-
-        }elseif ($text == "2") {
-            # code...
-            $response = "END Only test with the Hot Deals bundles as the process from now is the same.";
-
-        }elseif ($text == "3") {
-            # code...
-            $response = "END Only test with the Hot Deals bundles as the process from now is the same.";
-
-        }elseif ($text == "4") {
-            # code...
-            $response = "END Only test with the Hot Deals bundles as the process from now is the same.";
-
-        } elseif ($text == "5") {
-            # code...
-            $response = "END Only test with the Hot Deals bundles as the process from now is the same.";
-        }
-    }
-
-} 
-
 
 // Echo the response back to the API
 header('Content-type: text/plain');
